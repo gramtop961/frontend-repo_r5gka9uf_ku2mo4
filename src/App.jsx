@@ -3,118 +3,57 @@ import { AuthProvider, useAuth } from './components/AuthContext'
 import { LoginView, SignupView } from './components/AuthViews'
 import Dashboard from './components/Dashboard'
 import ListingExplorer from './components/ListingExplorer'
+import Landing from './components/Landing'
 import { motion, AnimatePresence } from 'framer-motion'
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: 0.1 * i, duration: 0.5, ease: [0.22, 1, 0.36, 1] } })
-}
 
 function Shell() {
   const { user } = useAuth()
-  const [mode, setMode] = useState('login')
+  const [mode, setMode] = useState(null) // 'login' | 'signup' | null
 
   if (!user) {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-green-900 via-emerald-900 to-slate-900">
-        {/* animated background orbs */}
-        <motion.div
-          className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl"
-          animate={{ scale: [1, 1.2, 1], x: [0, 20, 0], y: [0, -10, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute -bottom-24 -right-12 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl"
-          animate={{ scale: [1, 1.15, 1], x: [0, -30, 0], y: [0, 10, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        />
+      <div className="min-h-screen bg-black">
+        <Landing onLogin={() => setMode('login')} onSignup={() => setMode('signup')} />
 
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.2),transparent_40%),radial-gradient(circle_at_80%_50%,rgba(59,130,246,0.15),transparent_40%)]" />
-        <div className="relative min-h-screen flex items-center justify-center p-6">
-          <div className="w-full max-w-5xl grid md:grid-cols-2 gap-8">
-            <div>
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4"
+        {/* Auth modal over the landing */}
+        <AnimatePresence>
+          {mode && (
+            <motion.div
+              key="auth-modal"
+              className="fixed inset-0 z-50 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMode(null)}
+              />
+              <motion.div
+                className="relative z-10 w-full max-w-md px-4"
+                initial={{ y: 30, opacity: 0, scale: 0.98 }}
+                animate={{ y: 0, opacity: 1, scale: 1 }}
+                exit={{ y: 20, opacity: 0, scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 240, damping: 24 }}
               >
-                Agricompass
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-                className="text-white/80 mb-6"
-              >
-                A trusted B2B marketplace connecting farmers with buyers and field officers. Create an account to start listing produce or sourcing supplies.
-              </motion.p>
-              <motion.ul
-                initial="hidden"
-                animate="visible"
-                variants={{}}
-                className="space-y-2 text-white/80"
-              >
-                {[
-                  'Role-based access for farmers, buyers, and officers',
-                  'Browse live produce listings with filters',
-                  'Place and track orders',
-                  'Simple messaging for coordination'
-                ].map((t, i) => (
-                  <motion.li key={t} custom={i} variants={fadeInUp} className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
-                    {t}
-                  </motion.li>
-                ))}
-              </motion.ul>
-            </div>
-            <div>
-              <div className="flex gap-2 mb-4">
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  whileHover={{ y: -1 }}
-                  onClick={()=>setMode('login')}
-                  className={`px-4 py-2 rounded ${mode==='login'?'bg-white text-black':'bg-white/10 text-white border border-white/20'}`}
-                >
-                  Login
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  whileHover={{ y: -1 }}
-                  onClick={()=>setMode('signup')}
-                  className={`px-4 py-2 rounded ${mode==='signup'?'bg-white text-black':'bg-white/10 text-white border border-white/20'}`}
-                >
-                  Sign up
-                </motion.button>
-              </div>
-              <div className="relative">
-                <AnimatePresence mode="wait">
-                  {mode==='login' ? (
-                    <motion.div
-                      key="login"
-                      initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                      transition={{ duration: 0.35 }}
-                    >
-                      <LoginView/>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="signup"
-                      initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                      transition={{ duration: 0.35 }}
-                    >
-                      <SignupView/>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-          </div>
-        </div>
+                <div className="absolute -top-10 right-6">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => setMode(null)}
+                    className="rounded-full bg-white/10 border border-white/20 text-white px-3 py-1"
+                  >
+                    Close
+                  </motion.button>
+                </div>
+                {mode === 'login' ? <LoginView /> : <SignupView />}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     )
   }
@@ -127,10 +66,10 @@ function Shell() {
         animate="visible"
         variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
       >
-        <motion.div variants={fadeInUp}>
+        <motion.div variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } }}>
           <Dashboard />
         </motion.div>
-        <motion.div variants={fadeInUp}>
+        <motion.div variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } }}>
           <ListingExplorer />
         </motion.div>
       </motion.div>
