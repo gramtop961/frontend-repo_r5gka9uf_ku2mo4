@@ -1,72 +1,57 @@
-function App() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05),transparent_50%)]"></div>
+import { useState } from 'react'
+import { AuthProvider, useAuth } from './components/AuthContext'
+import { LoginView, SignupView } from './components/AuthViews'
+import Dashboard from './components/Dashboard'
+import ListingExplorer from './components/ListingExplorer'
 
-      <div className="relative min-h-screen flex items-center justify-center p-8">
-        <div className="max-w-2xl w-full">
-          {/* Header with Flames icon */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center mb-6">
-              <img
-                src="/flame-icon.svg"
-                alt="Flames"
-                className="w-24 h-24 drop-shadow-[0_0_25px_rgba(59,130,246,0.5)]"
-              />
+function Shell() {
+  const { user } = useAuth()
+  const [mode, setMode] = useState('login')
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-900 via-emerald-900 to-slate-900">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.2),transparent_40%),radial-gradient(circle_at_80%_50%,rgba(59,130,246,0.15),transparent_40%)]" />
+        <div className="relative min-h-screen flex items-center justify-center p-6">
+          <div className="w-full max-w-5xl grid md:grid-cols-2 gap-8">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">Agricompass</h1>
+              <p className="text-white/80 mb-6">A trusted B2B marketplace connecting farmers with buyers and field officers. Create an account to start listing produce or sourcing supplies.</p>
+              <ul className="space-y-2 text-white/80">
+                <li>• Role-based access for farmers, buyers, and officers</li>
+                <li>• Browse live produce listings with filters</li>
+                <li>• Place and track orders</li>
+                <li>• Simple messaging for coordination</li>
+              </ul>
             </div>
-
-            <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">
-              Flames Blue
-            </h1>
-
-            <p className="text-xl text-blue-200 mb-6">
-              Build applications through conversation
-            </p>
-          </div>
-
-          {/* Instructions */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-blue-500/20 rounded-2xl p-8 shadow-xl mb-6">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
-                1
+            <div>
+              <div className="flex gap-2 mb-4">
+                <button onClick={()=>setMode('login')} className={`px-4 py-2 rounded ${mode==='login'?'bg-white text-black':'bg-white/10 text-white border border-white/20'}`}>Login</button>
+                <button onClick={()=>setMode('signup')} className={`px-4 py-2 rounded ${mode==='signup'?'bg-white text-black':'bg-white/10 text-white border border-white/20'}`}>Sign up</button>
               </div>
-              <div>
-                <h3 className="font-semibold text-white mb-1">Describe your idea</h3>
-                <p className="text-blue-200/80 text-sm">Use the chat panel on the left to tell the AI what you want to build</p>
-              </div>
+              {mode==='login'? <LoginView/> : <SignupView/>}
             </div>
-
-            <div className="flex items-start gap-4 mb-6">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
-                2
-              </div>
-              <div>
-                <h3 className="font-semibold text-white mb-1">Watch it build</h3>
-                <p className="text-blue-200/80 text-sm">Your app will appear in this preview as the AI generates the code</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
-                3
-              </div>
-              <div>
-                <h3 className="font-semibold text-white mb-1">Refine and iterate</h3>
-                <p className="text-blue-200/80 text-sm">Continue the conversation to add features and make changes</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="text-center">
-            <p className="text-sm text-blue-300/60">
-              No coding required • Just describe what you want
-            </p>
           </div>
         </div>
       </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <Dashboard />
+        <ListingExplorer />
+      </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Shell />
+    </AuthProvider>
   )
 }
 
